@@ -29,12 +29,6 @@
             color: #651c1c;
         }
 
-        .subtitulo {
-            font-size: 13px;
-            color: #777;
-            margin-bottom: 20px;
-        }
-
         .label {
             display: block;
             text-align: left;
@@ -51,7 +45,6 @@
             border: 1px solid #ccc;
             border-radius: 8px;
             outline: none;
-            transition: 0.2s;
         }
 
         input[type="text"]:focus {
@@ -68,7 +61,6 @@
             border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
-            transition: 0.2s;
         }
 
         input[type="submit"]:hover {
@@ -81,11 +73,6 @@
             background: #f8f8f8;
             padding: 10px;
             border-radius: 8px;
-        }
-
-        .resultado h3 {
-            margin: 0 0 10px 0;
-            color: #651c1c;
         }
     </style>
 </head>
@@ -108,12 +95,20 @@
         $nombre = htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8');
         $edad = htmlspecialchars($edad, ENT_QUOTES, 'UTF-8');
 
-        // Normalización para que la primera letra esté en mayúscula
+        // Normalización para que nombre empiece en mayúscula
         $nombre = ucwords(strtolower($nombre));
 
         echo "<div class='resultado'>";
         echo "<b>Nombre:</b> " . $nombre . "<br>";
-        echo "<b>Edad:</b> " . $edad . "<br>";
+        echo "<b>Edad:</b> " . $edad . "<br><br>";
+
+        // Validación
+        if (is_numeric($edad) && $edad >= 18) {
+            echo "Usted puede votar en las próximas elecciones 2028.";
+        } else {
+            echo "Usted no es mayor de edad.";
+        }
+
         echo "</div>";
     }
     ?>
