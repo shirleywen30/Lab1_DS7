@@ -1,8 +1,43 @@
+<?php
+$valorPantalla = null; // Guarda el resultado para mostrarlo en la pantalla
+
+// Verifica si el formulario fue enviado
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    // Verifica que la expresión no esté vacía
+    if (!empty($_POST["expresion"])) {
+
+        $expresion = $_POST["expresion"]; // Captura la expresión ingresada
+
+        // Sanitiza para evitar código malicioso
+        $expresion = htmlspecialchars($expresion, ENT_QUOTES, 'UTF-8');
+
+        // Valida que solo haya números y operadores y que no termine en operador
+        if (preg_match('/^[0-9+\-*\.]+$/', $expresion) && !preg_match('/[+\-*]$/', $expresion)) {
+
+            try {
+                // Evalúa la expresión matemática
+                $resultado = eval("return $expresion;");
+
+                // Redondea el resultado a 2 decimales
+                $valorPantalla = round($resultado, 2);
+
+            } catch (Throwable $e) {
+                // Si ocurre error en el cálculo
+                $valorPantalla = "Error";
+            }
+
+        }
+    }
+}
+?>
+
 <html>
 <head>
     <title>PROBLEMA 6: Calculadora</title>
+
     <style>
-        /* Estilos para la página */
+        /* Estilo general de la página */
         body {
             font-family: Arial, sans-serif;
             background-color: rgba(67, 230, 67, 0.3);
@@ -12,122 +47,132 @@
             height: 100vh;
             margin: 0;
         }
-        /* Caja principal de la calculadora */
+
+        /* Contenedor de la calculadora */
         .calculadora {
-            background: #ffffff;
-            padding: 25px;
+            background: #2b2b2b;
+            padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-            width: 320px;
-            text-align: center;
+            width: 260px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
-        /* Título de la calculadora */
-        .calculadora h1 {
+
+        /* Pantalla donde se muestran números y resultado */
+        .pantalla {
+            width: 100%;
+            height: 50px;
+            background: #000;
+            color: #0f0;
             font-size: 22px;
-            margin-bottom: 20px;
-            color: #333;
-        }
-        /* Campos de texto y combobox */
-        input[type="text"], select {
-            width: 90%;
+            text-align: right;
             padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
             border-radius: 6px;
-            font-size: 16px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
         }
-        /* Botón de calcular */
-        input[type="submit"] {
-            background: #4CAF50;
-            color: white;
-            padding: 8px 14px;
+
+        /* Grid para organizar botones */
+        .botones {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        /* Estilo general de botones */
+        button {
+            padding: 15px;
+            font-size: 16px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 14px;
-            width: auto;
         }
-        input[type="submit"]:hover {
-            background: #45a049;
+
+        /* Botones de números */
+        .numero {
+            background: #3a3a3a;
+            color: white;
         }
-        /* Resultado */
-        .resultado {
-            margin-top: 15px;
-            font-size: 18px;
-            font-weight: bold;
-            color: #222;
+
+        /* Botones de operadores */
+        .operador {
+            background: #ff9500;
+            color: white;
         }
-        /* Mensaje de error */
-        .error {
-            margin-top: 15px;
-            font-size: 16px;
-            color: red;
+
+        /* Botón igual (más largo) */
+        .igual {
+            background: #4CAF50;
+            color: white;
+            grid-column: span 2;
+        }
+
+        /* Botón limpiar */
+        .clear {
+            background: #e53935;
+            color: white;
         }
     </style>
-</head>
-<body>
-    <div class="calculadora">
-        <h1>Calculadora</h1>
-        <!-- Formulario con dos campos para los números, el combobox y el botón para calcular -->
-        <form method="POST">
-            <input type="text" name="num1" placeholder="Número 1">
-            <input type="text" name="num2" placeholder="Número 2">
-            <select name="operacion">
-                <option value="suma">Suma</option>
-                <option value="resta">Resta</option>
-                <option value="multiplicacion">Multiplicación</option>
-                <option value="division">División</option>
-            </select>
-            <input type="submit" value="Calcular">
-        </form>
 
-        <?php
-        //Verifica que el formulario fue enviado
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            //Valida que ambos campos no estén vacíos
-            if ($_POST["num1"] !== "" && $_POST["num2"] !== "") {
-                //Valida que ambos valores sean numéricos
-                if (is_numeric($_POST["num1"]) && is_numeric($_POST["num2"])) {
-                    //Convierte a número decimal
-                    $num1 = floatval($_POST["num1"]);
-                    $num2 = floatval($_POST["num2"]);
-                    //Obtiene la operacion seleccionada
-                    $operacion = $_POST["operacion"];
-                    $resultado = "";
-
-                    //Selecciona la operación según el valor del combobox
-                    switch ($operacion) {
-                        case "suma":
-                            $resultado = $num1 + $num2;
-                            break;
-                        case "resta":
-                            $resultado = $num1 - $num2;
-                            break;
-                        case "multiplicacion":
-                            $resultado = $num1 * $num2;
-                            break;
-                        case "division":
-                            if ($num2 != 0) {
-                                $resultado = $num1 / $num2;
-                            } else {
-                                //Mensaje de error si se intenta dividir entre cero
-                                echo "<div class='error'>No se puede dividir entre cero.</div>";
-                                exit;
-                            }
-                            break;
-                    }
-                    //Muestra el resultado redondeado a 2 decimales
-                    echo "<div class='resultado'>Resultado: " . round($resultado, 2) . "</div>";
-                } else {
-                    //Mensaje si no se ingresa un número
-                    echo "<div class='error'>Debe ingresar valores numéricos válidos.</div>";
-                }
-            } else {
-                //Mensaje si algún campo está vacío
-                echo "<div class='error'>Debe ingresar ambos números.</div>";
-            }
+    <script>
+        // Agrega valores a la pantalla
+        function agregar(valor) {
+            document.getElementById("pantalla").value += valor;
         }
-        ?>
-    </div>
+
+        // Limpia la pantalla
+        function limpiar() {
+            document.getElementById("pantalla").value = "";
+        }
+    </script>
+</head>
+
+<body>
+
+<div class="calculadora">
+
+    <form method="POST">
+
+        <!-- Pantalla de la calculadora -->
+        <input type="text" id="pantalla" name="expresion" class="pantalla"
+        <?php if (!empty($valorPantalla)) echo 'value="'.$valorPantalla.'"'; ?> readonly>
+
+        <!-- Botones -->
+        <div class="botones">
+
+            <!-- Fila 1 -->
+            <button type="button" class="clear" onclick="limpiar()">C</button>
+            <button type="button"></button>
+            <button type="button"></button>
+            <button type="button"></button>
+
+            <!-- Fila 2 -->
+            <button type="button" class="numero" onclick="agregar('7')">7</button>
+            <button type="button" class="numero" onclick="agregar('8')">8</button>
+            <button type="button" class="numero" onclick="agregar('9')">9</button>
+            <button type="button" class="operador" onclick="agregar('*')">×</button>
+
+            <!-- Fila 3 -->
+            <button type="button" class="numero" onclick="agregar('4')">4</button>
+            <button type="button" class="numero" onclick="agregar('5')">5</button>
+            <button type="button" class="numero" onclick="agregar('6')">6</button>
+            <button type="button" class="operador" onclick="agregar('-')">−</button>
+
+            <!-- Fila 4 -->
+            <button type="button" class="numero" onclick="agregar('1')">1</button>
+            <button type="button" class="numero" onclick="agregar('2')">2</button>
+            <button type="button" class="numero" onclick="agregar('3')">3</button>
+            <button type="button" class="operador" onclick="agregar('+')">+</button>
+
+            <!-- Fila 5 -->
+            <button type="button" class="numero" onclick="agregar('0')">0</button>
+            <button type="button" class="numero" onclick="agregar('.')">.</button>
+            <button type="submit" class="igual">=</button>
+
+        </div>
+
+    </form>
+
+</div>
+
 </body>
 </html>
