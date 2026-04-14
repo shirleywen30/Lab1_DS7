@@ -1,17 +1,140 @@
-<?php
-//Obtiene el valor del campo "nombre" usando el REQUEST que viene del POST 
-$Nombre = $_REQUEST['nombre'];
-echo "El nombre es: " . $Nombre . "<br>";
+<html>
+<head>
+    <title>PROBLEMA 5: Formulario de entrada del dato</title>
 
-//Obtiene el valor del campo "edad" que viene del POST
-$Edad = $_POST["edad"];
+    <style>
+        /*Estilos para la página */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #651c1c;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
 
-//Verifica si la variable $Edad está definida y si es mayor a 18
-if (isset($Edad) && $Edad > 18) {
-    //  Mensaje si es mayor de edad
-    echo "Usted puede votar en las próximas elecciones 2028";
-} else {
-    // Mensaje si no es mayor de edad
-    echo "Usted no es mayor de edad";
-}
-?>
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            width: 360px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 5px;
+            color: #651c1c;
+        }
+
+        .subtitulo {
+            font-size: 13px;
+            color: #777;
+            margin-bottom: 20px;
+        }
+
+        .label {
+            display: block;
+            text-align: left;
+            font-weight: bold;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #4a90e2;
+            box-shadow: 0 0 4px rgba(74,144,226,0.4);
+        }
+
+        input[type="submit"] {
+            background-color: #ec3131;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.2s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #ed4267;
+        }
+
+        .resultado {
+            margin-top: 15px;
+            text-align: left;
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .resultado h3 {
+            margin: 0 0 10px 0;
+            color: #651c1c;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Formulario de Datos</h2>
+
+    <?php
+    // Normalización, trimming y sanitización
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+        // Trim para eliminar espacios en blanco
+        $nombre = trim($_POST["nombre"]);
+        $edad = trim($_POST["edad"]);
+
+        // Sanitización para convertir caracteres especiales en texto seguro
+        $nombre = htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8');
+        $edad = htmlspecialchars($edad, ENT_QUOTES, 'UTF-8');
+
+        // Normalización para que la primera letra esté en mayúscula
+        $nombre = ucwords(strtolower($nombre));
+
+        echo "<div class='resultado'>";
+        echo "<b>Nombre:</b> " . $nombre . "<br>";
+        echo "<b>Edad:</b> " . $edad . "<br>";
+        echo "</div>";
+    }
+    ?>
+
+    <!-- Formulario usando el método POST-->
+    <form method="post">
+
+        <!-- Campo para ingresar el nombre -->
+        <label class="label">Ingrese su nombre:</label>
+        <input type="text" name="nombre" id="nombre">
+
+        <!-- Campo para ingresar la edad -->
+        <label class="label">Ingrese su Edad:</label>
+        <input type="text" name="edad" id="edad">
+
+        <!-- Botón para enviar el formulario -->
+        <input type="submit" value="Confirmar">
+
+    </form>
+
+</div>
+
+</body>
+</html>
